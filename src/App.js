@@ -5,8 +5,9 @@ import Container from '@material-ui/core/Container';
 import { ReactQueryDevtools } from "react-query-devtools";
 import NavBar from './components/NavBar';
 import LoadingComponent from './components/LoadingComponent';
-import { ReactQueryConfigProvider } from "react-query";
+import { ReactQueryConfigProvider, queryCache } from "react-query";
 import { ErrorBoundary } from "react-error-boundary";
+import { fetchUsers } from './shared/dataOperations';
 
 const queryConfig = {
   shared: {
@@ -21,6 +22,9 @@ const PhotosList = lazy(() => import('./components/PhotosList')); // Lazy-loaded
 function App() {
   const [selectedUser, setSelectedUser] = useState(null);
   const [selectedAlbum, setSelectedAlbum] = useState(null);
+
+  if (selectedUser === null)
+    queryCache.prefetchQuery("users", fetchUsers);
 
   return (
     <>

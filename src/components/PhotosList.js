@@ -40,26 +40,26 @@ export default function PhotosList( { albumId }) {
 
   if (!isError)
     return (
-        <div className={classes.root}>
+      <div className={classes.root}>
         <GridListTile key="Subheader" cols={3} style={{ height: 'auto' }}>
-            <ListSubheader component="div"><h2>Photos</h2></ListSubheader>
+          <ListSubheader component="div"><h2>Photos</h2></ListSubheader>
         </GridListTile>
         <GridList cellHeight={150} cols={3} className={classes.gridList}>
-            {data.map((photo) => (
+          {data.map((photo) => (
             <GridListTile key={photo.thumbnailUrl}>
-                <img src={photo.thumbnailUrl} alt={photo.title} />
-                <GridListTileBar
-                title={photo.title}
-                actionIcon={
-                    <IconButton aria-label={`info about ${photo.title}`} className={classes.icon}>
-                    <InfoIcon />
-                    </IconButton>
-                }
-                />
+              <img src={photo.thumbnailUrl} alt={photo.title} />
+              <GridListTileBar
+              title={photo.title}
+              actionIcon={
+                <IconButton aria-label={`info about ${photo.title}`} className={classes.icon}>
+                  <InfoIcon />
+                </IconButton>
+              }
+              />
             </GridListTile>
-            ))}
+          ))}
         </GridList>
-        </div>
+      </div>
     );
   else return(<div></div>);
 

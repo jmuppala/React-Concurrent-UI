@@ -1,11 +1,12 @@
-import React from "react";
-import { useQuery } from "react-query";
+import React, { unstable_useTransition } from "react";
+import { useQuery, queryCache } from "react-query";
 import { useErrorHandler } from 'react-error-boundary';
-import { fetchUsers } from '../shared/dataOperations';
+import { fetchUsers, fetchAlbums } from '../shared/dataOperations';
 import { makeStyles } from '@material-ui/core/styles';
 import GridList from '@material-ui/core/GridList';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
+import LoadingComponent from './LoadingComponent';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -36,11 +37,15 @@ const useStyles = makeStyles((theme) => ({
 
 export default function UserList({ selectedUser, setSelectedUser, setSelectedAlbum }) {
   const classes = useStyles();
+  const [startTransition, isPending] = unstable_useTransition({ timeoutMs: 10000 });
 
   const handleListItemClick = (event, id) => {
-    console.log("user Id: ", + id);
-    setSelectedUser(id);
-    setSelectedAlbum(null);
+    startTransition(() => {
+      console.log("user Id: ", + id);
+      queryCache.prefetchQuery(["albums", id], fetchAlbums);
+      setSelectedUser(id);
+      setSelectedAlbum(null);
+    });
   };
 
   const { isError, data, error } = useQuery('users', fetchUsers);
@@ -52,20 +57,23 @@ export default function UserList({ selectedUser, setSelectedUser, setSelectedAlb
   
   if (!isError)
     return (
-        <div className={classes.root}>
-        <h2>Users</h2>
+      <div className={classes.root}>
+        <h2>Users</h2> 
         <GridList className={classes.gridList} cols={2.5} cellHeight='auto' spacing={20}>
-            {data.map((user) => (
-                <ListItem key={user.id} className={classes.listItem}
-                    button
-                    selected={selectedUser === user.id}
-                    onClick={(event) => handleListItemClick(event, user.id)}
-                >
-                    <ListItemText className={classes.title} primary={user.name} />
-                </ListItem>
-            ))}
+          {data.map((user) => (
+            <ListItem key={user.id} className={classes.listItem}
+              button disabled={isPending}
+              selected={selectedUser === user.id}
+              onClick={(event) => handleListItemClick(event, user.id)}
+            >
+              <ListItemText className={classes.title} primary={user.name} />
+            </ListItem>
+          ))}
         </GridList>
+        <div>
+          {isPending ? <LoadingComponent size={20} message={'Refreshing'} /> : null}
         </div>
+      </div>
     );
   else return(<div></div>);
 }

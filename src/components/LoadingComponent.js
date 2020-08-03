@@ -11,12 +11,12 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function LoadingComponent( { message }) {
+function LoadingComponent( { message, size=40 }) {
     const classes = useStyles();
 
     return (
       <div className={classes.root}>
-        <CircularProgress />
+        <CircularProgress size={size} />
         <p>{message} . . .</p>
       </div>
     );
